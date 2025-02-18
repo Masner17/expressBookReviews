@@ -5,11 +5,40 @@ const regd_users = express.Router();
 
 let users = [];
 
-const isValid = (username)=>{ //returns boolean
-//write code to check is the username is valid
-}
+// Función para validar si el nombre de usuario es válido
+const isValid = (username) => {
+    return username && username.length > 3; // Aquí puedes definir las reglas de validación
+};
 
-const authenticatedUser = (username,password)=>{ //returns boolean
+// Función para autenticar al usuario con su nombre y contraseña
+const authenticatedUser = (username, password) => {
+    // Lógica para verificar que el usuario y la contraseña coincidan
+    return username === 'usuario1' && password === 'contraseña123'; // Ejemplo simple
+};
+
+// Ruta para hacer login
+regd_users.post("/login", (req, res) => {
+    const { username, password } = req.body; // Recibimos el nombre de usuario y la contraseña desde el cuerpo de la solicitud
+
+    // Verificamos si el nombre de usuario es válido y si el usuario está autenticado
+    if (isValid(username) && authenticatedUser(username, password)) {
+        // Si es válido, generamos un token JWT
+        const accessToken = jwt.sign({ username: username }, "secret_customer", { expiresIn: '1h' });
+
+        // Guardamos el token en la sesión
+        req.session.authorization = {
+            accessToken: accessToken
+        };
+
+        // Enviamos el token al cliente
+        return res.status(200).json({ message: "Login successful", accessToken: accessToken });
+    } else {
+        // Si no es válido, enviamos un error
+        return res.status(401).json({ message: "Invalid username or password" });
+    }
+});
+
+const authenticatedUser2 = (username,password)=>{ //returns boolean
 //write code to check if username and password match the one we have in records.
 }
 
